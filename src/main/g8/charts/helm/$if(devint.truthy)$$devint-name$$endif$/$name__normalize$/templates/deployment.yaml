@@ -1,0 +1,67 @@
+{{- \$vaultPrefix := .Values.vaultPrefix -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "$name;format="lower,hyphen"$.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "$name;format="lower,hyphen"$.name" . }}
+    helm.sh/chart: {{ include "$name;format="lower,hyphen"$.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    tags.datadoghq.com/service: {{ include "$name;format="lower,hyphen"$.name" . }}
+    tags.datadoghq.com/version: {{ .Values.image.tag }}
+    tags.datadoghq.com/env: {{ .Values.env }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "$name;format="lower,hyphen"$.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      annotations:
+        {{- toYaml .Values.deployment.annotations | nindent 8 }}
+      labels:
+        app.kubernetes.io/name: {{ include "$name;format="lower,hyphen"$.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        tags.datadoghq.com/service: {{ include "$name;format="lower,hyphen"$.name" . }}
+        tags.datadoghq.com/version: {{ .Values.image.tag }}
+        tags.datadoghq.com/env: {{ .Values.env }}
+    spec:
+      serviceAccountName: {{ include "$name;format="lower,hyphen"$.name" . }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.livenessProbe.path }}
+              port: http
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.livenessProbe.path }}
+              port: http
+          env:
+{{ toYaml .Values.envs | indent 12 }}
+          {{- range \$key, \$val := .Values.secrets }}
+            - name: {{ \$key }}
+              value: {{ printf "%s%s" \$vaultPrefix \$val }}
+          {{- end }}
+          resources:
+{{ toYaml .Values.resources | indent 12 }}
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}

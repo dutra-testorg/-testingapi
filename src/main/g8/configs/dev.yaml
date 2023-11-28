@@ -1,0 +1,30 @@
+service_name: "$name;format="lower,hyphen"$"
+
+log_level: "INFO"
+
+log_dump: false
+
+profiler_enabled: true
+
+swagger_enabled: true
+
+environment: local
+
+server:
+    address: ":8080"
+    write_timeout: "15s"
+    read_timeout: "15s"
+    idle_timeout: "1m"
+    shutdown_timeout: "30s"
+
+cors:
+    allowed_headers: ["Authorization", "Content-Type", "*"]
+    allowed_methods: ["PUT", "GET", "POST", "DELETE", "PATCH", "OPTIONS"]
+    allowed_origins: ["*"]
+    exposed_headers: ["PUT", "GET", "POST", "DELETE", "PATCH", "OPTIONS"]
+    max_age: 1728000
+
+datadog:
+    host: "datadog.monitoring"
+    port: "8126"
+    enabled: false

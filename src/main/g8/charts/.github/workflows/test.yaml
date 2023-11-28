@@ -1,0 +1,12 @@
+name: Lint & Test
+
+on: push
+
+jobs:
+  lint_and_test:
+    runs-on: self-hosted
+
+    name: Lint and Test
+    steps:
+      - uses: actions/checkout@v2
+      - uses: gympass/helm-lint-test@v1

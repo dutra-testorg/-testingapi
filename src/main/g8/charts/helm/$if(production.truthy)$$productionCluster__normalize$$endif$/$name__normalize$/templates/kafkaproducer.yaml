@@ -1,0 +1,12 @@
+{{- if .Values.kafkaProducer.enabled }}
+{{- range .Values.kafkaProducer.producers }}
+---
+apiVersion: kafka.gympass.com/v1alpha1
+kind: KafkaProducer
+metadata:
+  name: {{ .name }}
+spec:
+  topic: {{ .topic }}
+  serviceAccountName: {{ include "$name;format="lower,hyphen"$.name" \$ }}
+{{- end }}
+{{- end }}

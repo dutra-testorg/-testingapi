@@ -1,0 +1,50 @@
+{{- if .Values.ingress.enabled -}}
+{{- \$fullName := include "$name;format="lower,hyphen"$.fullname" . -}}
+{{- \$name := include "$name;format="lower,hyphen"$.name" . -}}
+{{- \$ingressPath := .Values.ingress.path -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ \$fullName }}
+  labels:
+    app.kubernetes.io/name: {{ include "$name;format="lower,hyphen"$.name" . }}
+    helm.sh/chart: {{ include "$name;format="lower,hyphen"$.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+  annotations:
+{{- with .Values.ingress.annotations }}
+{{ toYaml . | indent 4 }}
+{{- end }}
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
+    alb.ingress.kubernetes.io/ssl-redirect: '443'
+spec:
+{{- if .Values.ingress.ingressClassName }}
+  ingressClassName: {{ .Values.ingress.ingressClassName | quote }}
+{{- end }}
+{{- if .Values.ingress.tls }}
+  tls:
+  {{- range .Values.ingress.tls }}
+    - hosts:
+      {{- range .hosts }}
+        - {{ . | quote }}
+      {{- end }}
+      secretName: {{ .secretName }}
+  {{- end }}
+{{- end }}
+  rules:
+  {{- range .Values.ingress.hosts }}
+    - host: {{ .host | quote }}
+      http:
+        paths:      
+        {{- range .paths }}
+          - path: {{ .path | quote }}
+            pathType: {{ .pathType | quote }}
+            backend:
+              service:
+                name: {{ .serviceName | quote }}
+                port:
+                  number: {{ .servicePort }}
+        {{- end }}
+  {{- end }}
+{{- end }}

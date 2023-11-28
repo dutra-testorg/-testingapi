@@ -1,0 +1,62 @@
+name: Build & Release
+
+on:
+  push:
+
+jobs:
+  test:
+    runs-on: [self-hosted]
+    services:
+      postgres:
+        image: postgres:14.2
+        env:
+          POSTGRES_PASSWORD: docker
+          POSTGRES_USER: postgres
+          POSTGRES_DB: testdb
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.19
+
+      - name: Exempt Gympass packages from Go's SUMDB and PROXY
+        run: echo "GOPRIVATE=\"github.com/Gympass,go.gympass.cloud\"" >> \$GITHUB_ENV
+
+      - name: Grant access to private Go Modules
+        run: git config --global url."https://\${{ secrets.GYMPASS_GO_PKG_TOKEN }}:@github.com/Gympass".insteadOf "https://github.com/Gympass"
+
+      - name: Run make deps
+        run: make deps
+
+      - name: Run check dep changes
+        run: if [ -n "\$(git status --porcelain)" ]; then git status --porcelain && exit 1; fi
+
+      - name: Run make lint
+        run: make lint
+
+      - name: Run tests
+        run: make pipeline-coverage
+
+  release:
+    runs-on: [self-hosted]
+
+    if: github.ref == 'refs/heads/master' || contains(github.ref, 'devint')
+
+    needs: test
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Push image to ECR
+        uses: gympass/ecr-deploy@v1
+        with:
+          namespace: $namespace;format="lower,hyphen"$

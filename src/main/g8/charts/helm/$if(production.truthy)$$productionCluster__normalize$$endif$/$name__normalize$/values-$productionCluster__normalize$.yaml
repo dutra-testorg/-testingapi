@@ -1,0 +1,110 @@
+replicaCount: 3
+
+image:
+  repository: 557130146574.dkr.ecr.us-east-1.amazonaws.com/$name;format="lower,hyphen"$
+  pullPolicy: IfNotPresent
+  tag: 0.0.0
+
+nameOverride: ""
+fullnameOverride: ""
+env: production
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  # To create your ingress, please reach our documentation: https://engineering.us.gympass.cloud/ingress/
+  enabled: false
+
+livenessProbe:
+  path: health
+
+resources:
+  limits:
+   cpu: 100m
+   memory: 128Mi
+  requests:
+   cpu: 100m
+   memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+envs:
+  - name: LOG_LEVEL
+    value: "INFO"
+  - name: LOG_DUMP
+    value: "false"
+  - name: SERVICE_NAME
+    value: "$name;format="lower,hyphen"$"
+  - name: PROFILER_ENABLED
+    value: "false"
+  - name: SWAGGER_ENABLED
+    value: "false"
+  - name: SERVER_ADDRESS
+    value: ":80"
+  - name: SERVER_WRITE_TIMEOUT
+    value: "15s"
+  - name: SERVER_READ_TIMEOUT
+    value: "15s"
+  - name: SERVER_IDLE_TIMEOUT
+    value: "1m"
+  - name: SERVER_SHUTDOWN_TIMEOUT
+    value: "30s"
+  - name: CORS_ALLOWED_HEADERS
+    value: "Authorization,Content-type,*"
+  - name: CORS_ALLOWED_METHODS
+    value: "PUT,GET,POST,DELETE,PATCH,OPTIONS"
+  - name: CORS_ALLOWED_ORIGINS
+    value: "*"
+  - name: CORS_EXPOSED_HEADERS
+    value: "PUT,GET,POST,DELETE,PATCH,OPTIONS"
+  - name: CORS_MAX_AGE
+    value: "1728000"
+  - name: DATADOG_HOST
+    value: "datadog.monitoring"
+  - name: DATADOG_PORT
+    value: "8126"
+  - name: DATADOG_ENABLED
+    value: "true"
+  - name: DD_TRACE_STARTUP_LOGS
+    value: "false"
+  - name: DD_ENV
+    valueFrom:
+      fieldRef:
+        fieldPath: metadata.labels['tags.datadoghq.com/env']
+  - name: DD_SERVICE
+    valueFrom:
+      fieldRef:
+        fieldPath: metadata.labels['tags.datadoghq.com/service']
+  - name: DD_VERSION
+    valueFrom:
+      fieldRef:
+        fieldPath: metadata.labels['tags.datadoghq.com/version']
+
+deployment:
+  annotations:
+    vault.security.banzaicloud.io/vault-role: $productionCluster__normalize$-$namespace;format="lower,hyphen"$-$name;format="lower,hyphen"$
+    kubectl.kubernetes.io/default-container: $name;format="lower,hyphen"$
+
+serviceAccount:
+  annotations:
+    external-role.gympass.com/vault-role: $productionCluster__normalize$-$namespace;format="lower,hyphen"$-$name;format="lower,hyphen"$
+    external-role.gympass.com/iam-oidc-role: $name;format="lower,hyphen"$
+    eks.amazonaws.com/role-arn: arn:aws:iam::557130146574:role/$name;format="lower,hyphen"$
+
+kafkaTopic:
+  enabled: false
+
+kafkaProducer:
+  enabled: false
+
+kafkaConsumer:
+  enabled: false
+
+kafkaConsumerGroup:
+  enabled: false

@@ -1,0 +1,15 @@
+{{- if .Values.kafkaConsumerGroup.enabled }}
+{{- range .Values.kafkaConsumerGroup.groups }}
+---
+apiVersion: kafka.gympass.com/v1alpha1
+kind: KafkaConsumerGroup
+metadata:
+  name: {{ .name }}
+spec:
+  topics:
+  {{- range .topics }}
+    - {{.}}
+  {{- end }}
+  serviceAccountName: {{ include "$name;format="lower,hyphen"$.name" \$ }}
+{{- end }}
+{{- end }}

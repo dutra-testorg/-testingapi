@@ -1,0 +1,12 @@
+{{- if .Values.kafkaConsumer.enabled }}
+{{- range .Values.kafkaConsumer.consumers }}
+---
+apiVersion: kafka.gympass.com/v1alpha1
+kind: KafkaConsumer
+metadata:
+  name: {{ .name }}
+spec:
+  topic: {{ .topic }}
+  serviceAccountName: {{ include "$name;format="lower,hyphen"$.name" \$ }}
+{{- end }}
+{{- end }}

@@ -1,0 +1,57 @@
+argoapp:
+  applicationName: $name$
+  applicationNamespace: $namespace$
+  project: $namespace$
+  releases:
+$if(staging.truthy)$
+    - cluster: staging
+      pathOverride: helm/staging/$name$
+$if(override.truthy)$
+      nameOverride: $nameOverride$
+$endif$
+      targetRevision: master
+      helm:
+        valueFiles:
+          - values-staging.yaml
+$endif$
+$if(production.truthy)$
+    - cluster: production
+      pathOverride: helm/production/$name$
+$if(override.truthy)$
+      nameOverride: $nameOverride$
+$endif$
+      targetRevision: master
+      helm:
+        valueFiles:
+          - values-production.yaml
+$endif$
+$if(new-ventures.truthy)$
+    - cluster: new-ventures
+      pathOverride: helm/new-ventures/$name$
+$if(override.truthy)$
+      nameOverride: $nameOverride$
+$endif$
+      targetRevision: master
+      helm:
+        valueFiles:
+          - values-new-ventures.yaml
+$endif$
+$if(pci.truthy)$
+    - cluster: pci
+      pathOverride: helm/pci/$name$
+$if(override.truthy)$
+      nameOverride: $nameOverride$
+$endif$
+      targetRevision: master
+      helm:
+        valueFiles:
+          - values-pci.yaml
+$endif$
+$if(devint.truthy)$
+    - cluster: staging
+      pathOverride: helm/$devint-name__normalize$/$name$
+      targetRevision: $devint-name__normalize$
+      helm:
+        valueFiles:
+          - values-$devint-name__normalize$.yaml
+$endif$

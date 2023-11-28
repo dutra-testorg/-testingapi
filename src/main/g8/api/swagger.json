@@ -1,0 +1,105 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "This is a health-check generated with 'swag init -g ./internal/rest/rest.go'.",
+        "title": "Swagger No-API",
+        "termsOfService": "http://swagger.io/terms/",
+        "contact": {
+            "name": "Support",
+            "url": "http://www.swagger.io/support",
+            "email": "support@swagger.io"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
+        "version": "1.0"
+    },
+    "paths": {
+        "/health": {
+            "get": {
+                "description": "Health-check returning a dummy HealthCheckResponse (config)",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Provide health-check endpoint",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "\$ref": "#/definitions/rest.HealthCheckResponse"
+                        }
+                    },
+                    "500": {}
+                }
+            }
+        },
+        "/v1/demo/{uid}": {
+            "get": {
+                "description": "demo endpoint returning a Demo struct",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get demo",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "uuidv4 (UUIDv4)",
+                        "name": "uid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "\$ref": "#/definitions/micro.Demo"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "\$ref": "#/definitions/middleware.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "\$ref": "#/definitions/middleware.HTTPError"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "micro.Demo": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                }
+            }
+        },
+        "middleware.HTTPError": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string"
+                }
+            }
+        },
+        "rest.HealthCheckResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "service": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

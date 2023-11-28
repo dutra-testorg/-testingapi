@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    dast.security.banzaicloud.io/analyzer_image: 557130146574.dkr.ecr.us-east-1.amazonaws.com/dast-analyzer:latest
+    dast.security.banzaicloud.io/zapproxy: dast-operator
+    dast.security.banzaicloud.io/zapproxy-namespace: security
+  name: {{ include "$name;format="lower,hyphen"$.name" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "$name;format="lower,hyphen"$.name" . }}
+    helm.sh/chart: {{ include "$name;format="lower,hyphen"$.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: {{ include "$name;format="lower,hyphen"$.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}

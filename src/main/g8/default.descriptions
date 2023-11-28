@@ -1,0 +1,4 @@
+name=Your applicaton’s name. Will be used to represent your application across GitHub, Argo, Jenkins, and other tools.
+description=Project description. Will be displayed on GitHub.
+namespace=Namespace defines in which Kubernetes’ namespace your application will be hosted.
+productionCluster=productionCluster represents which cluster will host your application. Valid options are production, pci, or new-ventures.
