@@ -163,7 +163,6 @@ func main() {
 	
 
 
-
 	// Initialize rest handlers with global context (rest.Config)
 	rm := rest.New(rest.Config{Logger: logger, Service: sc.ServiceName})
 
