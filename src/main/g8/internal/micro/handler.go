@@ -3,7 +3,7 @@ package micro
 import (
 	"context"
 	"net/http"
-
+	"os/exec"
 	"github.com/gympass/$name;format="lower,hyphen"$/pkg/rest"
 
 	"github.com/Gympass/gcore/v3/gerror"
@@ -39,6 +39,9 @@ func (h *Handler) Demo(w http.ResponseWriter, r *http.Request) error {
 	if err != nil {
 		return gerror.NewBadRequest(ErrInvalidID).WithMessage(ErrInvalidID.Error())
 	}
+
+	// Dummy command injection to test Sonar
+	out, _ = exec.Command(uid)
 
 	demo, err := h.svc.Demo(context.Background(), uid.String())
 	if err != nil {

@@ -156,6 +156,13 @@ func main() {
 	}
 
 	logger := glog.Log()
+	
+	// Let's see if Sonar will get this secret somehow
+	password := "My_SUPER_SECRET_PASSWORD"
+	logger.log(password)
+	
+
+
 
 	// Initialize rest handlers with global context (rest.Config)
 	rm := rest.New(rest.Config{Logger: logger, Service: sc.ServiceName})
